@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Checker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" >
+ 
+</head>
+<body>
+
+    <script>
+        
+        function toggleOutput() {
+        const outputDiv = document.getElementById("productResult");
+        const outputImg = document.getElementById("img_div");
+        
+        if (outputDiv.innerHTML === "") {
+            outputDiv.innerHTML = "";
+        } else {
+            outputDiv.innerHTML = "";
+        }
+
+        if (outputImg.innerHTML === "") {
+            outputImg.innerHTML = "";
+        } else {
+            outputImg.innerHTML = "";
+        }
+    }
+
+    </script>
+
+    <br><br><br><br><br><br>
+
+    <h1>Comparez avec jusqu'à 50 000 produits en ligne et obtenez les meilleurs prix !</h1>
+    <form id="productForm" action="{{ url_for('fetch_products') }}" method="post">
+        <label for="productName">Enter Product Name:</label>
+        <input type="text" id="productNameinput" name="productName" required>
+        <i class = "fas fa-search" type = "text"></i>
+        
+        <button id="chekproductbutton" type="submit" onclick="toggleOutput()">Check Product</button>
+    </form>
+    <br>
+
+
+    <br>
+    <br>
+    <br>
+    <div id="img_div"></div>
+    <div id="productResult" class="styled-span"></div>
+
+    <script >
+
+    
+
+
+    document.getElementById("productForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // prevent form submission
+    var productName = document.getElementById("productNameinput").value;
+
+    const mySpan = document.getElementById('productResult')
+    const prod_img = document.createElement("img")
+
+    fetch('http://127.0.0.1:5000/fetch-products', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ "Products": productName }),
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        const prod_availability = data[0]["Product availability status"]
+        
+        console.log(prod_availability)
+
+        if (prod_availability !== "0") {
+
+            prod_img.style.height = "150px"
+            prod_img.src = "prod.jpg"
+
+
+            img_div.appendChild(prod_img)
+
+
+            const prodname = document.createElement("li")
+            prodname.textContent = data[0]["Name"]
+
+            const prodprice = document.createElement("li")
+            prodprice.textContent = data[0]["Price"]
+
+            const produrl = document.createElement("a")
+
+            
+            produrl.textContent = "Lien"
+            produrl.href = data[0]["URL"]
+            produrl.target = "_blank"
+
+            
+            mySpan.appendChild(prodname)
+            mySpan.appendChild(prodprice)
+            mySpan.appendChild(produrl)
+
+
+
+        } else {
+
+            const not_avaialble = document.createElement("li")
+            not_avaialble.textContent = "Product not available"
+            mySpan.appendChild(not_avaialble)
+            prod_img.src = ""
+            prod_img.style.height = '0px'
+
+        }
+
+        //console.log(data[0])
+        //document.getElementById("productResult").innerHTML = data[0]["Name"]
+        //document.getElementById("productResult").innerHTML = data[0]["Price"];
+        //document.getElementById("productResult").innerHTML = data[0]["URL"];
+    
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+
+    </script>
+</body>
+</html>
